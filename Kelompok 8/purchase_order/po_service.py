@@ -2,6 +2,12 @@ from nameko.rpc import rpc
 
 import dependencies
 
+# Status Purchase Order
+# 1 = CREATED
+# 2 = ACCEPTED
+# 3 = DELIVERED
+# 4 = FINISHED
+# 5 = REJECTED
 
 class PurchaseOrderService:
 

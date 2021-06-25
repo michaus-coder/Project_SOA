@@ -12,7 +12,7 @@ class EntryDataBooking:
     def entry_booking(self, room_type_name, start_date, end_date, description):
         id_room_type = self.room_service.get_room_type(room_type_name)['id'] #masih menunggu microservice 'room_service'
         room = self.room_service.get_room_by_type(id_room_type) #masih menunggu microservice 'room_service'
-        
+
         check = False
         for room_info in room:
             print (room_info['id'])
@@ -72,3 +72,4 @@ class EntryDataBooking:
         
         
         #input: n.rpc.entry_service.entry_booking("Standard Room", "2021-06-07", "2021-06-08", "Saya ingin menginap dengan nyaman")
+    

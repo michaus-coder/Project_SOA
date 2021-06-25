@@ -62,6 +62,15 @@ class DatabaseWrapper:
         cursor.close()
         return "Delete purchase order success"
 
+    def create_supplier(self, supplier_name, supplier_address, supplier_phone_number_2, supplier_phone_number_1, supplier_email, supplier_last_update_by):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = "INSERT INTO `supplier` VALUES (DEFAULT,'{}','{}','{}','{}','{}',1,NOW(),{})".format(supplier_name, supplier_address, 
+                supplier_phone_number_2, supplier_phone_number_1, supplier_email, supplier_last_update_by)
+        cursor.execute(sql)
+        self.connection.commit()
+        cursor.close()
+        return "Add supplier success"
+
 
 class Database(DependencyProvider):
     connection_pool = None

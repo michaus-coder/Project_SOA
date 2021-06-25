@@ -18,13 +18,13 @@ class GatewayService:
     @http('GET', '/accident/')
     def get_compensation(self,request):
         payload = json.loads(request.get_data(as_text=True))
-        compensation = self.a_rpc.get_compensation(payload['id_booking'], payload['id_employee'])
+        compensation = self.a_rpc.get_compensation(payload['id_booking'])
         return json.dumps(compensation)
 
     @http('GET', '/accident/')
     def get_accident_report(self, request):
         payload = json.loads(request.get_data(as_text=True))
-        accident_report = self.a_rpc.get_accident_report(payload['id_booking'], payload['id_employee'])
+        accident_report = self.a_rpc.get_accident_report(payload['id_booking'])
         return json.dumps(accident_report)
 
     @http('PUT', '/accident/')
@@ -32,3 +32,8 @@ class GatewayService:
         payload = json.loads(request.get_data(as_text=True))
         update_accident = self.a_rpc.update_accident(payload['status'])
         return json.dumps(update_accident)
+
+    @http('GET', '/accident/')
+    def get_all_accident(self, request):
+        accident = self.a_rpc.get_all_accident
+        return json.dumps(accident)

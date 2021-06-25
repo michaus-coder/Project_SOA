@@ -25,21 +25,29 @@ class DatabaseWrapper:
         cursor.execute(sql)
         self.connection.commit()
         cursor.close()
-        return "edit accident success"
+        return "Edit Accident Auccess"
         
-    def get_compensation(self,id_booking,id_employee):
+    def get_compensation(self,id_booking):
         cursor = self.connection.cursor(dictionary=True)
-        sql = "SELECT compensation, compensation_cost FROM `accident` WHERE id_booking = {} and id_employee = {}".format(
-            id_booking, id_employee)
+        sql = "SELECT compensation, compensation_cost FROM `accident` WHERE id_booking = {}".format(
+            id_booking)
         cursor.execute(sql)
         result = cursor.fetchone()
         cursor.close()
         return result
 
-    def get_accident_report(self, id_booking, id_employee):
+    def get_accident_report(self, id_booking):
         cursor = self.connection.cursor(dictionary=True)
-        sql = "SELECT * FROM `accident` WHERE id_booking = {} and id_employee = {}".format(
-            id_booking, id_employee)
+        sql = "SELECT * FROM `accident` WHERE id_booking = {}".format(
+            id_booking)
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+
+    def get_all_accident(self):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = "SELECT * FROM `accident`"
         cursor.execute(sql)
         result = cursor.fetchone()
         cursor.close()
