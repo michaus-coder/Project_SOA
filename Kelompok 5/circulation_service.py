@@ -22,18 +22,18 @@ class CirculationService:
 
 
     @http('GET','/room_item_by_id/<int:id_room>/<int:id_item>')
-    def get_room_item_by_id(self, request, id_room, id_item):
+    def get_room_item_by_id_method(self, request, id_room, id_item):
         room_item = self.get_room_item_by_id(id_room, id_item)
         return json.dumps({'result': room_item})
 
     @http('POST', '/room_item')
-    def add_room_item(self, request):
+    def add_room_item_method(self, request):
         data = json.loads(request.get_data(as_text=True))
-        new_room_item = self.add_room_item(data['id_room'], data['id_item'])
+        new_room_item = self.add_room_item(data['id_room'], data['id_item'], data['qty'])
         return new_room_item
 
     @http('POST', '/circulation')
-    def add_circulation(self, request):
+    def add_circulation_method(self, request):
         data = json.loads(request.get_data(as_text=True))
         new_circulaton = self.add_circulation(data['id_room'], data['id_item'],  data['id_employee'], data['id_purchase'], data['qty'], data['date'], data['status'])
         return new_circulaton
