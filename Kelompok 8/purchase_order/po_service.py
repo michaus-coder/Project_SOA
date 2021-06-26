@@ -1,6 +1,7 @@
-from nameko.rpc import rpc
+from orchestration import PO_Orchestration
+from nameko.rpc import rpc, RpcProxy
 
-import dependencies
+from dependencies import dependencies
 
 # Status Purchase Order
 # 1 = CREATED
@@ -15,10 +16,19 @@ class PurchaseOrderService:
 
     database = dependencies.Database()
 
+    po_orchestration = RpcProxy('po_orchestration_service')
+
     @rpc
     def get_all_po(self):
         purchase_order = self.database.get_all_po()
         return purchase_order
+
+    @rpc
+    def get_po_by_id(self, purchase_id):
+        purchase_order = self.database.get_po_by_id(purchase_id)
+        detail_purchase_order = self.database.get_detail_po_by_id(purchase_id)
+        result = [purchase_order, detail_purchase_order]
+        return result
 
     @rpc
     def create_po(self, id_employee, id_supplier, detail_purchase_order):
@@ -32,8 +42,13 @@ class PurchaseOrderService:
 
     @rpc
     def change_status_po(self, id, status):
-        change_status_po = self.database.change_status_po(id, status)
-        return change_status_po
+        if status == 3:
+            change_status_po = self.database.change_status_po(id, status)
+            result = self.po_orchestration.circulation_item(id)
+            return result
+        else:
+            change_status_po = self.database.change_status_po(id, status)
+            return change_status_po
 
     @rpc
     def edit_po(self, id, id_employee, id_supplier, status):

@@ -14,11 +14,16 @@ class GatewayService:
         po = self.po_rpc.get_all_po()
         return json.dumps(po)
 
+    @http('GET', '/purchase_order/<string:id>')
+    def get_po(self, id):
+        po = self.po_rpc.get_po_by_id(id)
+        return json.dumps(po)
+
     @http('POST', '/purchase_order/')
     def create_po(self, request):
         payload = json.loads(request.get_data(as_text=True))
         new_po = self.po_rpc.create_po(payload['id_employee'], payload['id_supplier'], payload['detail_purchase_order'])
-        return json.dumps(new_po)
+        return new_po
 
     @http('PUT', '/status_purchase_order/')
     def change_status_po(self, request):

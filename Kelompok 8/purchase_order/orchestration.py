@@ -9,6 +9,7 @@ class PO_Orchestration:
     po_service = RpcProxy('po_service')
     supplier_service = RpcProxy('supplier_service')
     employee_service = RpcProxy('employee_service')
+    item_service = RpcProxy('item_service')
 
     #orchestration purchase order
     @rpc
@@ -20,82 +21,59 @@ class PO_Orchestration:
             return result
         else:
             return "Employee or supplier invalid"
-    
-    @rpc
-    def manager_evaluation(self, purchase_order_id, supplier_name, supplier_address, supplier_phone_number_1, supplier_phone_number_2, supplier_email, supplier_last_update_by):
-        
 
     @rpc
-    def add_supplier(self, name, address, phone_number1, phone_number2, email, status, last_update, last_update_by):
-        id_room_type = self.room_service.get_room_type(room_type_name)['id']
-        # masih menunggu microservice 'room_service'
-        room = self.room_service.get_room_by_type(id_room_type)
-
-        check = False
-        for room_info in room:
-            print(room_info['id'])
-            check_booking_sebelumnya = self.booking_service.get_booking_by_room(
-                room_info['id'], start_date, end_date)
-            if check_booking_sebelumnya == True:
-                insert_data = self.booking_service.add_booking(
-                    1, id_room_type, room_info['id'], 1, start_date, end_date, description, 1)
-                check = True
-                break
-
-        if check == False:
-            return {'status': 0, 'message': 'Maaf, kamar tidak tersedia untuk saat ini'}
-        elif check == True:
-            return insert_data
+    def circulation_item(self, purchase_id):
+        detail_purchase_order = self.po_service.get_detail_po_by_id(purchase_id)
+        for detail in detail_purchase_order:
+            self.item_service.update_item(detail['id'], detail['qty'], detail['unit'])
+        return "Circulation success"
 
     @rpc
-    def update_booking_room(self, id_booking):
-        id_room_type = self.booking_service.get_booking_by_id(id_booking)[
-            'id_room_type']
-        start_date = self.booking_service.get_booking_by_id(id_booking)[
-            'start_date']
-        end_date = self.booking_service.get_booking_by_id(id_booking)[
-            'end_date']
-        room = self.room_service.get_room_by_type(id_room_type)
-
-        check = False
-        for room_info in room:
-            print(room_info['id'])
-            check_booking_sebelumnya = self.booking_service.get_booking_by_room(
-                room_info['id'], start_date, end_date)
-            if check_booking_sebelumnya == True:
-                update_data = self.booking_service.update_booking_room(
-                    id_booking, room_info['id'], id_room_type)
-                check = True
-                break
-
-        if check == False:
-            return {'status': 0, 'message': 'Maaf, penukaran kamar tidak tersedia untuk saat ini'}
-        elif check == True:
-            return update_data
-
-    #BARUUUUUUUUUUUUUUUUUUUUUU
-    @rpc
-    def check_order_review(self, ktp):
-        id_customer = self.booking_service.get_customer_by_citizenNum(ktp)[
-            'id']
-        id_booking = self.booking_service.get_booking_by_id_customer(
-            id_customer)
-        customer_name = self.booking_service.get_customer_by_citizenNum(ktp)[
-            'name']  # nama customer
-
-        result = []
-        for customer_booking in id_booking:
-            id_room_type = self.booking_service.get_booking_by_id(customer_booking['id'])[
-                'id_room_type']
-            result.append({
-                'id': customer_booking['id'],
-                'Nama Customer': customer_name,
-                'Tipe Kamar yang dipesan': self.room_service.get_room_type_by_id(id_room_type)['name'],
-                'Booking Date': customer_booking['booking_date'],
-                'Start Date': customer_booking['start_date'],
-                'End Date': customer_booking['end_date'],
-                'Servis yang dipilih': self.booking_service.get_all_service_by_booking_id(customer_booking['id'])
-            })
+    def get_report(self, purchase_id):
+        purchase_order = self.po_service.get_po_by_id(purchase_id)
+        detail_purchase_order = self.po_service.get_detail_po_by_id(purchase_id)
+        detail_po_result = []
+        for detail in detail_purchase_order:
+            item = self.item_service.get_item_by_id(detail['id_item'])
+            detail_result = {
+                "name" : item['name'],
+                "barcode" : item['barcode'],
+                "quantity" : detail['qty'],
+                "unit" : detail['unit'],
+                "price_per_unit" : detail['price_per_unit']
+            }
+            detail_po_result.append(detail_result)
+        employee = self.employee_service.get_employee_by_id(purchase_order['id_employee'])
+        supplier = self.supplier_service.get_supplier_by_id(purchase_order['id_supplier'])
+        result = {
+            "date" : purchase_order['date'],
+            "employee" : {
+                "name" : employee['name'],
+                "date_of_birth" : employee['date_of_birth'],
+                "citizen_number" : employee['citizen_number'],
+                "gender" : employee['gender'],
+                "address" : employee['address'],
+                "phone_number_1" : employee['phone_number1'],
+                "phone_number_2" : employee['phone_number2'],
+                "email" : employee['email']
+            },
+            "supplier" : {
+                "name" : supplier['name'],
+                "address" : supplier['address'],
+                "phone_number_1" : supplier['phone_number1'],
+                "phone_number_2" : supplier['phone_number2'],
+                "email" : supplier['email']
+            },
+            "detail_purchase_order" : detail_po_result
+        }
         return result
+    
+    # @rpc
+    # def manager_evaluation(self, purchase_order_id, status):
+    #     if status == 1:
+    #         self.po_service.change_status_po(purchase_order_id, 2)
+    #     elif status == 2:
+    #         self.po_service.change_status_po(purchase_order_id, 5)
 
-        #input: n.rpc.entry_service.entry_booking("Standard Room", "2021-06-07", "2021-06-08", "Saya ingin menginap dengan nyaman")
+    

@@ -1,6 +1,6 @@
 from nameko.rpc import rpc
 
-import dependencies
+from dependencies import dependencies
 
 class Item:
     #hanya dihardcode karena kelompok supplier belom

@@ -17,14 +17,30 @@ class DatabaseWrapper:
         cursor.close()
         return result
 
+    def get_po_by_id(self, purchase_id):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = "SELECT * FROM purchase_order WHERE id = {}".format(purchase_id)
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+
+    def get_detail_po_by_id(self, purchase_id):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = "SELECT * FROM detail_purchase_order WHERE id_purchase = {}".format(purchase_id)
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cursor.close()
+        return result
+
     def create_po(self, id_employee, id_supplier, detail_purchase_order):
         cursor = self.connection.cursor(dictionary=True)
-        sql = "INSERT INTO purchase_order VALUES (NULL,{},{},CURDATE(),0)".format(
+        sql = "INSERT INTO purchase_order VALUES (NULL,{},{},CURDATE(),1)".format(
             id_employee, id_supplier)
         cursor.execute(sql)
         self.connection.commit()
         cursor.close()
-        #self.create_detail_po(detail_purchase_order)
+        self.create_detail_po(detail_purchase_order)
         return "Add purchase order success"
 
     def create_detail_po(self, detail_purchase_order):
@@ -34,7 +50,7 @@ class DatabaseWrapper:
             detail_po['id_item'], detail_po['id_purchase'], detail_po['qty'], detail_po['unit'], detail_po['price_per_unit'])
             cursor.execute(sql)
             self.connection.commit()
-            cursor.close()  
+        cursor.close()  
         return "Add detail purchase order success"
         
     def change_status_po(self, id, status):

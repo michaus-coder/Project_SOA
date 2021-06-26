@@ -1,6 +1,6 @@
 from nameko.rpc import rpc
 
-import dependencies
+from dependencies import dependencies
 
 class Employee:
     #hanya dihardcode karena kelompok employee belom
