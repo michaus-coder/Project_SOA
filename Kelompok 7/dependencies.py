@@ -36,10 +36,10 @@ class DatabaseWrapper:
         cursor.close()
         return result
 
-    def get_accident_report(self, id_booking):
+    def get_accident_report(self, start_date, end_date):
         cursor = self.connection.cursor(dictionary=True)
-        sql = "SELECT * FROM `accident` WHERE id_booking = {}".format(
-            id_booking)
+        sql = "SELECT COUNT(id) AS jumlah_accident from `accident` WHERE {}<=date  AND {}>=date".format(
+            start_date, end_date)
         cursor.execute(sql)
         result = cursor.fetchone()
         cursor.close()
@@ -49,7 +49,7 @@ class DatabaseWrapper:
         cursor = self.connection.cursor(dictionary=True)
         sql = "SELECT * FROM `accident`"
         cursor.execute(sql)
-        result = cursor.fetchone()
+        result = cursor.fetchall()
         cursor.close()
         return result
 
