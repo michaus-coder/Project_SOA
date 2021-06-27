@@ -1,5 +1,5 @@
-from orchestration import PO_Orchestration
 from nameko.rpc import rpc, RpcProxy
+from nameko.events import EventDispatcher
 
 from dependencies import dependencies
 
@@ -15,8 +15,7 @@ class PurchaseOrderService:
     name = 'po_service'
 
     database = dependencies.Database()
-
-    po_orchestration = RpcProxy('po_orchestration_service')
+    dispacth = EventDispatcher();
 
     @rpc
     def get_all_po(self):
@@ -42,13 +41,13 @@ class PurchaseOrderService:
 
     @rpc
     def change_status_po(self, id, status):
+        change_status_po = self.database.change_status_po(id, status)
         if status == 3:
-            change_status_po = self.database.change_status_po(id, status)
-            result = self.po_orchestration.circulation_item(id)
-            return result
-        else:
-            change_status_po = self.database.change_status_po(id, status)
-            return change_status_po
+            # Run PubSub
+            # result = self.po_orchestration.circulation_item(id)
+            # return result
+            self.dispacth("circulation_item_event", id)
+        return change_status_po
 
     @rpc
     def edit_po(self, id, id_employee, id_supplier, status):

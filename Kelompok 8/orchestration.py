@@ -1,4 +1,5 @@
 from nameko.rpc import rpc, RpcProxy
+from nameko.events import event_handler
 import json
 import sys
 
@@ -11,23 +12,25 @@ class PO_Orchestration:
     employee_service = RpcProxy('employee_service')
     item_service = RpcProxy('item_service')
 
-    #orchestration purchase order
+    # PubSub for circulation
+    @event_handler("po_service", "circulation_item_event")
+    def handle_circulation_item(self, purchase_id):
+        detail_purchase_order = self.po_service.get_detail_po_by_id(purchase_id)
+        for detail in detail_purchase_order:
+            self.item_service.update_item(detail['id'], detail['qty'], detail['unit'])
+        return "Circulation success"
+
+    #Orchestration purchase order
     @rpc
     def create_po(self, employee_id, supplier_id, detail_purchase_order):
         check_employee = self.employee_service.get_employee_id(employee_id)
         check_supplier = self.supplier_service.get_supplier_id(supplier_id)
         if check_employee == True and check_supplier == True:
-            result = self.po_service.create_po(employee_id, supplier_id, detail_purchase_order)
+            result = self.po_service.create_po(
+                employee_id, supplier_id, detail_purchase_order)
             return result
         else:
             return "Employee or supplier invalid"
-
-    @rpc
-    def circulation_item(self, purchase_id):
-        detail_purchase_order = self.po_service.get_detail_po_by_id(purchase_id)
-        for detail in detail_purchase_order:
-            self.item_service.update_item(detail['id'], detail['qty'], detail['unit'])
-        return "Circulation success"
 
     @rpc
     def get_report(self, purchase_id):
