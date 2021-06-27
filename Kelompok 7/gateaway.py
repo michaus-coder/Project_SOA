@@ -30,7 +30,7 @@ class GatewayService:
     @http('PUT', '/accident/')
     def update_accident(self, request):
         payload = json.loads(request.get_data(as_text=True))
-        update_accident = self.a_rpc.update_accident(payload['status'])
+        update_accident = self.a_rpc.update_accident(payload['id_accident'], payload['status'])
         return json.dumps(update_accident)
 
     @http('GET', '/accident/')
