@@ -18,10 +18,10 @@ class DatabaseWrapper:
         cursor.close()
         return "Add Accident Success"
 
-    def update_accident(self, status):
+    def update_accident(self, id_accident, status):
         cursor = self.connection.cursor(dictionary=True)
         sql = "UPDATE `accident SET status={} WHERE id = {}".format(
-            status, id)
+            status, id_accident)
         cursor.execute(sql)
         self.connection.commit()
         cursor.close()
