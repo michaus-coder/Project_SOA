@@ -19,18 +19,18 @@ class AccidentService:
         return compensation
 
     @rpc
-    def get_accident_report(self, id_booking):
-        accident_report = self.database.get_accident_report()
+    def get_accident_report(self, start_date, end_date):
+        accident_report = self.database.get_accident_report(start_date, end_date)
         return accident_report
 
     @rpc
-    def update_accident(self, status):
+    def update_accident(self, id_accident, status):
         updated_accident = self.database.update_accident(
-            status, id)
+            id_accident, status)
         return updated_accident
 
     @rpc
     def get_all_accident(self):
-        accident=self.database.get_a
+        accident=self.database.get_all_accident()
 
     
