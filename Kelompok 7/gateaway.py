@@ -24,7 +24,7 @@ class GatewayService:
     @http('GET', '/accident/')
     def get_accident_report(self, request):
         payload = json.loads(request.get_data(as_text=True))
-        accident_report = self.a_rpc.get_accident_report(payload['id_booking'])
+        accident_report = self.a_rpc.get_accident_report(payload['start_date'], payload['end_date'])
         return json.dumps(accident_report)
 
     @http('PUT', '/accident/')
